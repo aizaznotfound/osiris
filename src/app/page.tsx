@@ -226,8 +226,19 @@ export default function Dashboard() {
   const [demoMode] = useState(false);
   const [osirisTheme, setOsirisTheme] = useState<'core'|'ghost'>('core');
 
+  // Restore the saved theme, or follow the device's light/dark setting on first visit.
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('osiris-theme');
+      if (saved === 'core' || saved === 'ghost') { setOsirisTheme(saved); return; }
+      if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) setOsirisTheme('ghost');
+    } catch { /* storage unavailable */ }
+  }, []);
+
   useEffect(() => {
     document.body.className = osirisTheme === 'core' ? '' : `theme-${osirisTheme}`;
+    try { localStorage.setItem('osiris-theme', osirisTheme); } catch { /* ignore */ }
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', osirisTheme === 'ghost' ? '#08001A' : '#1A73E8');
   }, [osirisTheme]);
 
   const isMobile = useIsMobile();

@@ -2,7 +2,22 @@ import { Pool, type PoolClient } from 'pg';
 
 let pool: Pool | null = null;
 
+// On Vercel, with no PG_HOST configured, fail immediately instead of trying
+// localhost:5432 on every request (callers already handle failure and fall
+// back to live fetching).
+const PG_DISABLED = !!process.env.VERCEL && !process.env.PG_HOST;
+
+function disabledPool(): Pool {
+  return new Proxy({}, {
+    get(_t, prop) {
+      if (prop === 'then' || typeof prop === 'symbol') return undefined;
+      return () => { throw new Error('Postgres not configured'); };
+    },
+  }) as unknown as Pool;
+}
+
 export function getPool(): Pool {
+  if (PG_DISABLED) return disabledPool();
   if (!pool) {
     pool = new Pool({
       host: process.env.PG_HOST ?? 'localhost',

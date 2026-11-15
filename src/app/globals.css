@@ -112,8 +112,8 @@ body.theme-ghost {
   --border-cyan: rgba(124, 77, 255, 0.25);
 
   --text-primary: #E1BEE7;
-  --text-secondary: #9575CD;
-  --text-muted: #4A148C;
+  --text-secondary: #B39DDB;
+  --text-muted: #8E7CC3;  /* was #4A148C: too dark to read on the dark background */
   --text-heading: #B388FF;
   --text-gold: #B388FF;
   --text-cyan: #7C4DFF;
